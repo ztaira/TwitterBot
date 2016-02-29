@@ -29,8 +29,8 @@ class TwitterBot():
 
     def searchtweets(self, handle='@zachary_taira', sstring='Hello, world!',
                      update=False):
-        """Saves the text of a certain user's tweets to file and searches it.
-        If update is true, updates tweet logs.
+        """Searches a string against a given user's tweet log.
+        If update is true, updates tweet logs before checking.
         Only uses 1 API call via self.tweet2file"""
         if update is True:
             self.tweet2file(handle)
@@ -43,8 +43,9 @@ class TwitterBot():
             return False
 
     def newtweets(self, handle='@zachary_taira'):
-        """Gets the most recent tweet. If that tweet is not in a user's logs,
-        it must be a new tweet, so return True.
+        """Returns True if the user has a new tweet since the last check.
+        Does this by getting the most recent tweet and checking it.
+        If it's in the log, it's old. If it's not, it's new. 
         Uses 1 API call."""
         userID = login_credentials.get_user(handle)
         tweet = self.twitter.statuses.user_timeline(user_id=userID,
@@ -59,3 +60,14 @@ class TwitterBot():
             return False
         else:
             return True
+
+    def poststatus(self, new_status="Hello World!"):
+        """Posts a new status to twitter."""
+        self.twitter.statuses.update(status=new_status)
+
+    def postfromfile(self, fname="queue.txt"):
+        file = open(fname, 'r')
+        firstline = file.readline()
+        file.close()
+        self.twitter.statuses.update(status=firstline)
+        # todo: delete first line from file
