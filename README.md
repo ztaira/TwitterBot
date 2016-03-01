@@ -8,6 +8,8 @@ Can currently do the following things:
 
 • Check if a user has posted any new tweets
 
+• Get a user's newest tweet
+
 • Get a the ID of a user's newest tweet
 
 • Get the text of a user's newest tweet
