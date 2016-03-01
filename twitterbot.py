@@ -118,4 +118,5 @@ class TwitterBot():
 
     def behavior(self):
         """This is what the twitterbot does when running"""
-        # do stuff here
+        # do stuff
+        return 0
