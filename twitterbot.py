@@ -48,7 +48,7 @@ class TwitterBot():
     def newtweets(self, handle='@zachary_taira'):
         """Returns True if the user has a new tweet since the last check.
         Does this by getting the most recent tweet and checking it.
-        If it's in the log, it's old. If it's not, it's new. 
+        If it's in the log, it's old. If it's not, it's new.
         Uses 1 API call."""
         userID = login_credentials.get_user(handle)
         tweet = self.twitter.statuses.user_timeline(user_id=userID,
@@ -85,6 +85,15 @@ class TwitterBot():
         for line in line_list:
             file.write(line)
         file.close()
+
+    def getnewtweetid(self, handle='@zachary_taira'):
+        """Get a user's newest tweet ID. Uses 1 API call."""
+        tweet = self.twitter.statuses.user_timeline(user_id=userID,
+                                                    count=1,
+                                                    trim_user=True,
+                                                    exclude_replies=True,
+                                                    include_rts=False)
+        return tweet[0]['id_str']
 
     def behavior(self):
         """This is what the twitterbot does when running"""
