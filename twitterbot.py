@@ -88,6 +88,7 @@ class TwitterBot():
 
     def getnewtweetid(self, handle='@zachary_taira'):
         """Get the ID if a user's newest tweet. Uses 1 API call."""
+        userID = login_credentials.get_user(handle)
         tweet = self.twitter.statuses.user_timeline(user_id=userID,
                                                     count=1,
                                                     trim_user=True,
@@ -97,6 +98,7 @@ class TwitterBot():
 
     def getnewtweettext(self, handle='@zachary_taira'):
         """Get the text of a user's newest tweet. Uses 1 API call."""
+        userID = login_credentials.get_user(handle)
         tweet = self.twitter.statuses.user_timeline(user_id=userID,
                                                     count=1,
                                                     trim_user=True,
@@ -104,14 +106,15 @@ class TwitterBot():
                                                     include_rts=False)
         return tweet[0]['text']
 
-    def  getnewtweet(self, handle='@zachary_taira'):
+    def getnewtweet(self, handle='@zachary_taira'):
         """Get a user's newest tweet. Uses 1 API call."""
+        userID = login_credentials.get_user(handle)
         tweet = self.twitter.statuses.user_timeline(user_id=userID,
                                                     count=1,
                                                     trim_user=True,
                                                     exclude_replies=True,
                                                     include_rts=False)
-        return tweet
+        return tweet[0]
 
     def behavior(self):
         """This is what the twitterbot does when running"""
