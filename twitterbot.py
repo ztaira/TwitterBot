@@ -1,5 +1,6 @@
 from twitter import *
 import login_credentials
+import time
 
 
 class TwitterBot():
@@ -9,6 +10,8 @@ class TwitterBot():
         self.twitter = Twitter(auth=OAuth(self.creds[0], self.creds[1],
                                self.creds[2], self.creds[3]))
         print("Logged in to twitter! :D")
+        print("Executing programmed behavior...")
+        self.behavior()
 
     def tweet2file(self, handle='@zachary_taira'):
         """Saves the text of a certain user's original tweets to file.
@@ -62,12 +65,27 @@ class TwitterBot():
             return True
 
     def poststatus(self, new_status="Hello World!"):
-        """Posts a new status to twitter."""
+        """Posts a new status to twitter. Uses 1 API Call."""
         self.twitter.statuses.update(status=new_status)
 
     def postfromfile(self, fname="queue.txt"):
+        """Takes the first line of a file, posts it to twitter, then removes it.
+        Uses 1 API Call."""
+        # creates a line store
+        line_list = []
+        # reads and posts the first line
         file = open(fname, 'r')
         firstline = file.readline()
-        file.close()
         self.twitter.statuses.update(status=firstline)
-        # todo: delete first line from file
+        # removes it and writes the rest of the lines over the original file
+        for line in file:
+            line_list.append(line)
+        file.close()
+        file = open(fname, 'w+')
+        for line in line_list:
+            file.write(line)
+        file.close()
+
+    def behavior(self):
+        """This is what the twitterbot does when running"""
+        # do stuff here
