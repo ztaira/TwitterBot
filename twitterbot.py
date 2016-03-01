@@ -95,6 +95,15 @@ class TwitterBot():
                                                     include_rts=False)
         return tweet[0]['id_str']
 
+    def getnewtweettext(self, handle='@zachary_taira'):
+        """Get the text of a user's newest tweet. Uses 1 API call."""
+        tweet = self.twitter.statuses.user_timeline(user_id=userID,
+                                                    count=1,
+                                                    trim_user=True,
+                                                    exclude_replies=True,
+                                                    include_rts=False)
+        return tweet[0]['text']
+
     def behavior(self):
         """This is what the twitterbot does when running"""
         # do stuff here
