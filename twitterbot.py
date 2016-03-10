@@ -125,7 +125,7 @@ class TwitterBot():
         for mention in mentions:
             file.write('\n(')
             file.write(mention['text'])
-            file.write(')' + str(mention['user']['name']) + '\n')
+            file.write(') ' + str(mention['user']['name']) + '\n')
         file.close()
 
     def getnewmention(self):
