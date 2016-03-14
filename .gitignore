@@ -1,4 +1,4 @@
 login_credentials.py
 config.py
 *.txt
-
+__pycache__
