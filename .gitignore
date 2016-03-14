@@ -2,3 +2,5 @@ login_credentials.py
 config.py
 *.txt
 __pycache__
+
+*.pyc
