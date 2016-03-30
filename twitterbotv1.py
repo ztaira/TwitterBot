@@ -19,7 +19,7 @@ class TwitterBot():
     def tweet2file(self, handle='@zachary_taira'):
         """Saves the text of a certain user's original tweets to file.
         File name is handle.txt
-        Uses 1 API call."""
+        Uses 1 API call to get the tweets, and then one for each new user."""
         file = open(handle+'.txt', 'w+')
         userID = login_credentials.get_user(handle)
         tweets = self.twitter.statuses.user_timeline(user_id=userID,
@@ -27,10 +27,15 @@ class TwitterBot():
                                                      trim_user=True,
                                                      exclude_replies=True,
                                                      include_rts=False)
+        users = {}
         for tweet in tweets:
+            if tweet['user']['id_str'] not in users:
+                user = self.twitter.users.show(user_id=tweet['user']['id_str'])
+                users[tweet['user']['id_str']] = user['screen_name']
             file.write('\n(')
-            file.write(tweet['text'])
-            file.write(')\n')
+            file.write(repr(tweet['text']))
+            file.write(') by @' + users[tweet['user']['id_str']])
+            file.write('\n')
         file.close()
 
     def searchtweets(self, handle='@zachary_taira', sstring='Hello, world!',
@@ -62,41 +67,62 @@ class TwitterBot():
         file = open(handle+'.txt', 'r')
         filetext = file.read()
         file.close()
-        if tweet[0]['text'] in filetext:
+        if repr(tweet[0]['text']) in filetext:
             return False
         else:
             self.tweet2file()
             return True
 
     def getnewtweetid(self, handle='@zachary_taira'):
-        """Get the ID if a user's newest tweet. Uses 1 API call."""
+        """Get the IDs of a user's newest tweets. Uses 1 API call."""
         userID = login_credentials.get_user(handle)
-        tweet = self.twitter.statuses.user_timeline(user_id=userID,
-                                                    count=1,
+        tweets = self.twitter.statuses.user_timeline(user_id=userID,
+                                                    count=100,
                                                     trim_user=True,
                                                     exclude_replies=True,
                                                     include_rts=False)
-        return tweet[0]['id_str']
+        id_list = []
+        file = open(handle+'.txt')
+        filetext = file.read()
+        file.close()
+        for tweet in tweets:
+            if repr(tweet['text']) not in filetext:
+                id_list.append(tweet['id_str'])
+        return id_list
 
     def getnewtweettext(self, handle='@zachary_taira'):
-        """Get the text of a user's newest tweet. Uses 1 API call."""
+        """Get the text of a user's newest tweets. Uses 1 API call."""
         userID = login_credentials.get_user(handle)
-        tweet = self.twitter.statuses.user_timeline(user_id=userID,
+        tweets = self.twitter.statuses.user_timeline(user_id=userID,
                                                     count=1,
                                                     trim_user=True,
                                                     exclude_replies=True,
                                                     include_rts=False)
-        return tweet[0]['text']
+        text_list = []
+        file = open(handle+'.txt')
+        filetext = file.read()
+        file.close()
+        for tweet in tweets:
+            if repr(tweet['text']) not in filetext:
+                text_list.append(repr(tweet['text']))
+        return text_list
 
-    def getnewtweet(self, handle='@zachary_taira'):
+    def getnewtweets(self, handle='@zachary_taira'):
         """Get a user's newest tweet. Uses 1 API call."""
         userID = login_credentials.get_user(handle)
-        tweet = self.twitter.statuses.user_timeline(user_id=userID,
+        tweets = self.twitter.statuses.user_timeline(user_id=userID,
                                                     count=1,
                                                     trim_user=True,
                                                     exclude_replies=True,
                                                     include_rts=False)
-        return tweet[0]
+        tweet_list = []
+        file = open(handle+'.txt')
+        filetext = file.read()
+        file.close()
+        for tweet in tweets:
+            if repr(tweet['text']) not in filetext:
+                tweet_list.append(tweet)
+        return tweet_list
 
 
     # Statuses
@@ -124,6 +150,8 @@ class TwitterBot():
         file.close()
 
     # Mentions
+    # TODO:
+    # Make the getnewmention__ functions take more than 1 thing
     # ================================================================
     def mention2file(self):
         """writes all mentions to file. Uses 1 API call."""
@@ -141,7 +169,7 @@ class TwitterBot():
         return mentions[0]
 
     def getnewmentionuser(self):
-        """Gets the user who did the latest mention.""" 
+        """Gets the user who did the latest mention."""
         mentions = self.twitter.statuses.mentions_timeline(count=1)
         return mentions[0]['user']['name']
 
@@ -181,8 +209,11 @@ class TwitterBot():
         """Gets the text of the latest mention."""
         mentions = self.twitter.statuses.mentions_timeline(count=1)
         return str(mentions[0]['text'])
-        
+
     def behavior(self):
         """This is what the twitterbot does when running"""
         # do stuff
         return 0
+
+if __name__ == '__main__':
+    z = TwitterBot()
