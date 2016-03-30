@@ -14,6 +14,8 @@ class TwitterBot():
         self.handle='@zachary_taira'
         self.behavior()
 
+    # Tweets
+    # ================================================================
     def tweet2file(self, handle='@zachary_taira'):
         """Saves the text of a certain user's original tweets to file.
         File name is handle.txt
@@ -46,7 +48,7 @@ class TwitterBot():
         else:
             return False
 
-    def newtweets(self, handle='@zachary_taira'):
+    def hasnewtweet(self, handle='@zachary_taira'):
         """Returns True if the user has a new tweet since the last check.
         Does this by getting the most recent tweet and checking it.
         If it's in the log, it's old. If it's not, it's new.
@@ -65,28 +67,6 @@ class TwitterBot():
         else:
             self.tweet2file()
             return True
-
-    def poststatus(self, new_status="Hello World!"):
-        """Posts a new status to twitter. Uses 1 API Call."""
-        self.twitter.statuses.update(status=new_status)
-
-    def postfromfile(self, fname="queue.txt"):
-        """Takes the first line of a file, posts it to twitter, then removes it.
-        Uses 1 API Call."""
-        # creates a line store
-        line_list = []
-        # reads and posts the first line
-        file = open(fname, 'r')
-        firstline = file.readline()
-        self.twitter.statuses.update(status=firstline)
-        # removes it and writes the rest of the lines over the original file
-        for line in file:
-            line_list.append(line)
-        file.close()
-        file = open(fname, 'w+')
-        for line in line_list:
-            file.write(line)
-        file.close()
 
     def getnewtweetid(self, handle='@zachary_taira'):
         """Get the ID if a user's newest tweet. Uses 1 API call."""
@@ -118,6 +98,33 @@ class TwitterBot():
                                                     include_rts=False)
         return tweet[0]
 
+
+    # Statuses
+    # ================================================================
+    def poststatus(self, new_status="Hello World!"):
+        """Posts a new status to twitter. Uses 1 API Call."""
+        self.twitter.statuses.update(status=new_status)
+
+    def postfromfile(self, fname="queue.txt"):
+        """Takes the first line of a file, posts it to twitter, then removes it.
+        Uses 1 API Call."""
+        # creates a line store
+        line_list = []
+        # reads and posts the first line
+        file = open(fname, 'r')
+        firstline = file.readline()
+        self.twitter.statuses.update(status=firstline)
+        # removes it and writes the rest of the lines over the original file
+        for line in file:
+            line_list.append(line)
+        file.close()
+        file = open(fname, 'w+')
+        for line in line_list:
+            file.write(line)
+        file.close()
+
+    # Mentions
+    # ================================================================
     def mention2file(self):
         """writes all mentions to file. Uses 1 API call."""
         mentions = self.twitter.statuses.mentions_timeline()
@@ -158,7 +165,7 @@ class TwitterBot():
         else:
             return False
 
-    def newmention(self):
+    def hasnewmention(self):
         """Returns true if there's a new mention. Uses 1 API call."""
         mention = self.getnewmention()
         file = open(self.handle+'m.txt', 'r')
