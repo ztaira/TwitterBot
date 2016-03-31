@@ -1,6 +1,7 @@
 from twitter import *
 import login_credentials
 import time
+import re
 
 
 class TwitterBot():
@@ -21,7 +22,8 @@ class TwitterBot():
         File name is handle.txt
         Uses 1 API call to get the tweets, and then one for each new user."""
         file = open(handle+'.txt', 'w+')
-        userID = login_credentials.get_user(handle)
+        user = self.getuser(handle)
+        userID = user['id_str']
         tweets = self.twitter.statuses.user_timeline(user_id=userID,
                                                      count=100,
                                                      trim_user=True,
@@ -32,9 +34,9 @@ class TwitterBot():
             if tweet['user']['id_str'] not in users:
                 user = self.twitter.users.show(user_id=tweet['user']['id_str'])
                 users[tweet['user']['id_str']] = user['screen_name']
-            file.write('\n(')
-            file.write(repr(tweet['text']))
-            file.write(') by @' + users[tweet['user']['id_str']])
+            file.write('\n('+repr(tweet['text'].encode())+')')
+            file.write(' by @' + users[tweet['user']['id_str']])
+            file.write(' with ID:'+tweet['id_str'])
             file.write('\n')
         file.close()
 
@@ -124,6 +126,43 @@ class TwitterBot():
                 tweet_list.append(tweet)
         return tweet_list
 
+    def getretweets(self, tweet_id):
+        """Gets retweets of a tweet specified by the id. Uses 1 API Call."""
+        retweets = self.twitter.statuses.retweets(id=int(tweet_id))
+        return retweets
+
+    def retweet2file(self, tweet_id):
+        """Prints retweets to file. Uses 1 API call for the retweets.
+        Also uses 1 additional call for every user."""
+        file=open(tweet_id+'rt.txt', 'w+')
+        retweets = self.twitter.statuses.retweets(id=int(tweet_id))
+        users = {}
+        for tweet in retweets:
+            if tweet['user']['id_str'] not in users:
+                user = self.twitter.users.show(user_id=tweet['user']['id_str'])
+                users[tweet['user']['id_str']] = user['screen_name']
+            file.write('\n('+repr(tweet['text'].encode())+')')
+            file.write(' by @' + users[tweet['user']['id_str']])
+            file.write(' with ID:'+tweet['id_str'])
+            file.write('\n')
+        file.close()
+
+    def reply2file(self, tweet_id):
+        """Prints replies to a file. Uses 1 API call for the replies.
+        Also uses 1 additional call for every user."""
+        file=open(tweet_id+'rp.txt', 'w+')
+        replies = self.twitter.statuses.retweets(id=int(tweet_id))
+        users = {}
+        for tweet in replies:
+            if tweet['user']['id_str'] not in users:
+                user = self.twitter.users.show(user_id=tweet['user']['id_str'])
+                users[tweet['user']['id_str']] = user['screen_name']
+            file.write('\n('+repr(tweet['text'].encode())+')')
+            file.write(' by @' + users[tweet['user']['id_str']])
+            file.write(' with ID:'+tweet['id_str'])
+            file.write('\n')
+        file.close()
+        
 
     # Statuses
     # ================================================================
@@ -157,10 +196,15 @@ class TwitterBot():
         """writes all mentions to file. Uses 1 API call."""
         mentions = self.twitter.statuses.mentions_timeline()
         file = open(self.handle+'m.txt', 'w+')
-        for mention in mentions:
-            file.write('\n(')
-            file.write(mention['text'])
-            file.write(') ' + str(mention['user']['name']) + '\n')
+        users = {}
+        for tweet in mentions:
+            if tweet['user']['id_str'] not in users:
+                user = self.twitter.users.show(user_id=tweet['user']['id_str'])
+                users[tweet['user']['id_str']] = user['screen_name']
+            file.write('\n('+repr(tweet['text'].encode())+')')
+            file.write(' by @' + users[tweet['user']['id_str']])
+            file.write(' with ID:'+tweet['id_str'])
+            file.write('\n')
         file.close()
 
     def getnewmention(self):
@@ -205,15 +249,17 @@ class TwitterBot():
             self.mention2file()
             return True
 
-    def getnewmentiontext(self):
-        """Gets the text of the latest mention."""
-        mentions = self.twitter.statuses.mentions_timeline(count=1)
-        return str(mentions[0]['text'])
-
     def behavior(self):
         """This is what the twitterbot does when running"""
         # do stuff
         return 0
 
+        # Users
+        # ============================================================
+    def getuser(self, handle='@zachary_taira'):
+        """Gets user. Uses 1 API call."""
+        user = self.twitter.users.show(screen_name=handle)
+        return {'screen_name':user['screen_name'], 'id_str':user['id_str']}
+    
 if __name__ == '__main__':
     z = TwitterBot()
