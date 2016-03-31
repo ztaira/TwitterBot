@@ -25,9 +25,9 @@ class TwitterBot():
         user = self.getuser(handle)
         userID = user['id_str']
         tweets = self.twitter.statuses.user_timeline(user_id=userID,
-                                                     count=100,
+                                                     count=3000,
                                                      trim_user=True,
-                                                     exclude_replies=True,
+                                                     exclude_replies=False,
                                                      include_rts=False)
         users = {}
         for tweet in tweets:
@@ -37,6 +37,7 @@ class TwitterBot():
             file.write('\n('+repr(tweet['text'].encode())+')')
             file.write(' by @' + users[tweet['user']['id_str']])
             file.write(' with ID:'+tweet['id_str'])
+            file.write(' in reply to ID:'+str(tweet['in_reply_to_status_id']))
             file.write('\n')
         file.close()
 
@@ -204,23 +205,13 @@ class TwitterBot():
             file.write('\n('+repr(tweet['text'].encode())+')')
             file.write(' by @' + users[tweet['user']['id_str']])
             file.write(' with ID:'+tweet['id_str'])
+            file.write(' in reply to ID:'+str(tweet['in_reply_to_status_id']))
             file.write('\n')
         file.close()
 
-    def getnewmention(self):
-        """Gets the latest mention. Uses 1 API call."""
-        mentions = self.twitter.statuses.mentions_timeline(count=1)
-        return mentions[0]
-
-    def getnewmentionuser(self):
-        """Gets the user who did the latest mention."""
-        mentions = self.twitter.statuses.mentions_timeline(count=1)
-        return mentions[0]['user']['name']
-
-    def getnewmentionhandle(self):
-        """Gets the handle of the user who did the latest mention."""
-        mentions = self.twitter.statuses.mentions_timeline(count=1)
-        return '@'+str(mentions[0]['user']['screen_name'])
+    def getmentions(self):
+        """Gets the mentions. Uses 1 API call."""
+        return self.twitter.statuses.mentions_timeline()
 
     def searchmentions(self, handle='@zachary_taira', sstring='Hello, world!',
                      update=False):
