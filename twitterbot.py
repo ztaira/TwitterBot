@@ -13,10 +13,42 @@ class TwitterBot():
         print("Logged in to twitter! :D")
         print("Executing programmed behavior...")
         self.handle='@zachary_taira'
-        self.behavior()
 
     # Tweets
     # ================================================================
+    def getalltweets(self):
+        tweets = self.twitter.statuses.user_timeline(user_id=self.handle,
+                                                     count=1000,
+                                                     trim_user=True,
+                                                     exclude_replies=False,
+                                                     include_rts=False)
+        mentions = self.twitter.statuses.mentions_timeline()
+        all_tweets = []
+        users = {}
+        for tweet in tweets:
+            if tweet['user']['id_str'] not in users:
+                user = self.twitter.users.show(user_id=tweet['user']['id_str'])
+                users[tweet['user']['id_str']] = user['screen_name']
+            all_tweets.append({'handle': user['screen_name'],
+                               'user_id': tweet['user']['id_str'],
+                               'user_screen_name': '@'+user['screen_name'],
+                               'text': repr(tweet['text']),
+                               'id_str': tweet['id_str'],
+                               'date': tweet['created_at'],
+                               'in_reply_to': tweet['in_reply_to_status_id']})
+        for tweet in mentions:
+            if tweet['user']['id_str'] not in users:
+                user = self.twitter.users.show(user_id=tweet['user']['id_str'])
+                users[tweet['user']['id_str']] = user['screen_name']
+            all_tweets.append({'handle': user['screen_name'],
+                               'user_id': tweet['user']['id_str'],
+                               'user_screen_name': user['screen_name'],
+                               'text': repr(tweet['text']).encode(),
+                               'id_str': tweet['id_str'],
+                               'date': tweet['created_at'],
+                               'in_reply_to': tweet['in_reply_to_status_id']})
+        return all_tweets
+    
     def tweet2file(self, handle='@zachary_taira'):
         """Saves the text of a certain user's original tweets to file.
         File name is handle.txt
@@ -239,11 +271,6 @@ class TwitterBot():
         else:
             self.mention2file()
             return True
-
-    def behavior(self):
-        """This is what the twitterbot does when running"""
-        # do stuff
-        return 0
 
         # Users
         # ============================================================
