@@ -6,19 +6,19 @@ import re
 
 class TwitterBot():
     """My twitterbot, aptly named."""
-    def __init__(self):
+    def __init__(self, myhandle):
         self.creds = login_credentials.get_login_credentials()
         self.twitter = Twitter(auth=OAuth(self.creds[0], self.creds[1],
                                self.creds[2], self.creds[3]))
         print("Logged in to twitter! :D")
         print("Executing programmed behavior...")
-        self.handle='@zachary_taira'
+        self.handle=myhandle
 
     # Tweets
     # ================================================================
     def getalltweets(self):
         tweets = self.twitter.statuses.user_timeline(user_id=self.handle,
-                                                     count=1000,
+                                                     count=2000,
                                                      trim_user=True,
                                                      exclude_replies=False,
                                                      include_rts=False)
