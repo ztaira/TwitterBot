@@ -10,8 +10,8 @@ class TwitterBot():
         config = configparser.ConfigParser()
         config.read('config.txt')
         print(config['LOGINCREDS'])
-        self.twitter = Twitter(auth=OAuth(config['LOGINCREDS']['oauth_token'], 
-                                          config['LOGINCREDS']['oauth_secret'], 
+        self.twitter = Twitter(auth=OAuth(config['LOGINCREDS']['oauth_token'],
+                                          config['LOGINCREDS']['oauth_secret'],
                                           config['LOGINCREDS']['con_key'],
                                           config['LOGINCREDS']['con_secret']))
         print("Logged in to twitter! :D")
