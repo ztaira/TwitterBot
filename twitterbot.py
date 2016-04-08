@@ -1,5 +1,5 @@
 from twitter import *
-import login_credentials
+import configparser
 import time
 import re
 
@@ -7,9 +7,13 @@ import re
 class TwitterBot():
     """My twitterbot, aptly named."""
     def __init__(self, myhandle):
-        self.creds = login_credentials.get_login_credentials()
-        self.twitter = Twitter(auth=OAuth(self.creds[0], self.creds[1],
-                               self.creds[2], self.creds[3]))
+        config = configparser.ConfigParser()
+        config.read('config.txt')
+        print(config['LOGINCREDS'])
+        self.twitter = Twitter(auth=OAuth(config['LOGINCREDS']['oauth_token'], 
+                                          config['LOGINCREDS']['oauth_secret'], 
+                                          config['LOGINCREDS']['con_key'],
+                                          config['LOGINCREDS']['con_secret']))
         print("Logged in to twitter! :D")
         print("Executing programmed behavior...")
         self.handle=myhandle
@@ -280,4 +284,4 @@ class TwitterBot():
         return {'screen_name':user['screen_name'], 'id_str':user['id_str']}
     
 if __name__ == '__main__':
-    z = TwitterBot()
+    z = TwitterBot('@zachary_taira')
